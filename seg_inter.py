@@ -119,12 +119,14 @@ def find_intersections(event):
             pred = T.predecessor(node)
             if pred and intersect(node.data[0], node.data[1], pred.data[0], pred.data[1]):
                 int_pnt = intersection_point(node.data[0], node.data[1], pred.data[0], pred.data[1])
-                Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, event.label, None))
+                if int_pnt[0] > event.x:
+                    Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, event.label, None))
                 # check for the other parameters in the event object
             succ = T.successor(node)
             if succ and intersect(node.data[0], node.data[1], succ.data[0], succ.data[1]):
                 int_pnt = intersection_point(node.data[0], node.data[1], succ.data[0], succ.data[1])
-                Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, event.label, None, succ.key, None))
+                if int_pnt[0] > event.x:
+                    Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, event.label, None, succ.key, None))
                 # check for the other parameters in the event object
             if pred and succ and intersect(succ.data[0], succ.data[1], pred.data[0], pred.data[1]):
                 int_pnt = intersection_point(succ.data[0], succ.data[1], pred.data[0], pred.data[1])
@@ -141,7 +143,8 @@ def find_intersections(event):
                 succ = T.successor(node)
                 if pred and succ and intersect(succ.data[0], succ.data[1], pred.data[0], pred.data[1]):
                     int_pnt = intersection_point(succ.data[0], succ.data[1], pred.data[0], pred.data[1])
-                    Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, succ.key, None))
+                    if int_pnt[0] > event.x:
+                        Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, succ.key, None))
                 T.delete(node)
             else:
                 print('right endpoint node not found')
@@ -159,12 +162,14 @@ def find_intersections(event):
                 pred = T.predecessor(n1)
                 if pred and intersect(n1.data[0], n1.data[1], pred.data[0], pred.data[1]):
                     int_pnt = intersection_point(n1.data[0], n1.data[1], pred.data[0], pred.data[1])
-                    Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, event.slabel, None))
+                    if int_pnt[0] > event.x:
+                        Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, event.slabel, None))
             if n2:
                 succ = T.successor(n2)
                 if succ and intersect(n2.data[0], n2.data[1], succ.data[0], succ.data[1]):
                     int_pnt = intersection_point(n2.data[0], n2.data[1], succ.data[0], succ.data[1])
-                    Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, event.plabel, None, succ.key, None))
+                    if int_pnt[0] > event.x:
+                        Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, event.plabel, None, succ.key, None))
             if n1 and succ and intersect(succ.data[0], succ.data[1], n1.data[0], n1.data[1]):
                 int_pnt = intersection_point(succ.data[0], succ.data[1], n1.data[0], n1.data[1])
                 int_node = Q.search(int_pnt[0])
@@ -204,10 +209,10 @@ if __name__ == "__main__":
 
     # S = [((100, 300), (850, 400)), ((290, 250), (700, 600)), ((200, 500), (900, 300)), ((280, 350), (300, 900)), ((320, 870), (400, 550))]
     # S = [((100, 300), (850, 400)), ((290, 250), (700, 600)), ((200, 500), (900, 300)), ((280, 350), (300, 900))]
-    S = [((100, 300), (850, 400)), ((290, 250), (700, 600)), ((200, 500), (900, 300))]
+    # S = [((100, 300), (850, 400)), ((290, 250), (700, 600)), ((200, 500), (900, 300))]
     # S = [((742, 655), (412, 440)), ((776, 786), (495, 339)), ((402, 598), (469, 124)), ((869, 481), (888, 806)), ((230, 154), (433, 773)), ((439, 366), (816,785)), ((593, 391), (887, 346)), ((855, 859), (444, 683)), ((531, 523), (242, 817)), ((357, 870), (700, 658))]
     # S = [((439, 366), (816,785)), ((855, 859), (444, 683)), ((357, 870), (700, 658))]
-    # S = [((random.randint(100, 900), random.randint(100, 900)), (random.randint(100, 900), random.randint(100, 900))) for _ in range(10)]
+    S = [((random.randint(100, 900), random.randint(100, 900)), (random.randint(100, 900), random.randint(100, 900))) for _ in range(10)]
 
     print(S)
     I = find_intersections(None)
