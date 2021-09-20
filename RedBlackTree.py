@@ -184,30 +184,14 @@ class RedBlackTree:
 
     def swap(self, nn1, nn2):
         # fn used to swap two nodes in the tree
-        temp = Node(nn1.key, nn1.data)
-        temp.left = nn2.left
-        temp.right = nn2.right
-        temp.color = nn2.color
-        temp.parent = nn2.parent
+        tempKey = nn1.key
+        tempData = nn1.data
 
-        nn1p = nn1.parent
-        nn2p = nn2.parent
+        nn1.key = nn2.key
+        nn1.data = nn2.data
 
-        if nn2p.left and nn2p.left.key == nn2.key:
-            nn2p.left = temp
-        else:
-            nn2p.right = temp
-
-        temp2 = Node(nn2.key, nn2.data)
-        temp2.left = nn1.left
-        temp2.right = nn1.right
-        temp2.color = nn1.color
-        temp2.parent = nn1.parent
-
-        if nn1p.left and nn1p.left.key == nn1.key:
-            nn1p.left = temp2
-        else:
-            nn1p.right = temp2
+        nn2.key = tempKey
+        nn2.data = tempData
 
     def insert_segment(self, label, segment):
         # fn used to insert a segment into the tree

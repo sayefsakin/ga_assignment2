@@ -148,18 +148,20 @@ def find_intersections(event):
         else:
             # print("intersection event")
             intersections.append((event.x, event.y))
-            n2 = T.searchx(T.root, event.plabel)
-            n1 = T.searchx(T.root, event.slabel)
+            n1 = T.searchx(T.root, event.plabel)
+            n2 = T.searchx(T.root, event.slabel)
             if n1 and n2:
                 T.swap(n1, n2)
-            pred = T.predecessor(n1)
-            if pred and intersect(n1.data[0], n1.data[1], pred.data[0], pred.data[1]):
-                int_pnt = intersection_point(n1.data[0], n1.data[1], pred.data[0], pred.data[1])
-                Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, event.label, None))
-            succ = T.successor(n2)
-            if succ and intersect(n2.data[0], n2.data[1], succ.data[0], succ.data[1]):
-                int_pnt = intersection_point(n2.data[0], n2.data[1], succ.data[0], succ.data[1])
-                Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, event.label, None, succ.key, None))
+            if n1:
+                pred = T.predecessor(n1)
+                if pred and intersect(n1.data[0], n1.data[1], pred.data[0], pred.data[1]):
+                    int_pnt = intersection_point(n1.data[0], n1.data[1], pred.data[0], pred.data[1])
+                    Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, event.label, None))
+            if n2:
+                succ = T.successor(n2)
+                if succ and intersect(n2.data[0], n2.data[1], succ.data[0], succ.data[1]):
+                    int_pnt = intersection_point(n2.data[0], n2.data[1], succ.data[0], succ.data[1])
+                    Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, event.label, None, succ.key, None))
             if n1 and succ and intersect(succ.data[0], succ.data[1], n1.data[0], n1.data[1]):
                 int_pnt = intersection_point(succ.data[0], succ.data[1], n1.data[0], n1.data[1])
                 int_node = Q.search(int_pnt[0])
@@ -197,11 +199,15 @@ if __name__ == "__main__":
     canvas.bind("<Button-1>", find_intersections)
     canvas.grid(row=0, column=0)
 
-    #S = [((20,50),(900,400)), ((80,500),(850,200))]
-    S = [((random.randint(100, 900), random.randint(100, 900)),(random.randint(100, 900), random.randint(100, 900))) for _ in range(10)]
+    # S = [((50, 50), (600, 300)), ((200, 800), (550, 100))]
+    S = [((random.randint(100, 900), random.randint(100, 900)), (random.randint(100, 900), random.randint(100, 900))) for _ in range(10)]
 
     print(S)
-    find_intersections(None)
+    I = find_intersections(None)
+    print("intersections")
+    print(I)
+    for i in I:
+        drawPoint(i)
     drawSegments(S)
 
     root.mainloop()
