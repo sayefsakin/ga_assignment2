@@ -5,7 +5,7 @@ import random
 from tkinter import *
 import copy
 
-YSIZE = 1000
+YSIZE = 750
 PSIZE = 4
 
 # -----------------------------------------------------------------
@@ -177,7 +177,9 @@ def find_intersections(event):
                 int_node = Q.search(int_pnt[0])
                 if int_node and feq(int_node.data.y, int_pnt[1]):
                     Q.delete(int_node)
-    return intersections
+    for ip in intersections:
+        drawPoint(ip)
+    # return intersections
 
 
 def drawSegments(S):
@@ -204,19 +206,28 @@ if __name__ == "__main__":
     canvas.bind("<Button-1>", find_intersections)
     canvas.grid(row=0, column=0)
 
-    S = [((100, 300), (850, 400)), ((290, 250), (700, 600)), ((200, 500), (900, 300)), ((280, 350), (300, 900)), ((320, 870), (400, 550))]
-    # S = [((100, 300), (850, 400)), ((290, 250), (700, 600)), ((200, 500), (900, 300)), ((280, 350), (300, 900))]
-    # S = [((100, 300), (850, 400)), ((290, 250), (700, 600)), ((200, 500), (900, 300))]
-    # S = [((742, 655), (412, 440)), ((776, 786), (495, 339)), ((402, 598), (469, 124)), ((869, 481), (888, 806)), ((230, 154), (433, 773)), ((439, 366), (816,785)), ((593, 391), (887, 346)), ((855, 859), (444, 683)), ((531, 523), (242, 817)), ((357, 870), (700, 658))]
-    # S = [((439, 366), (816,785)), ((855, 859), (444, 683)), ((357, 870), (700, 658))]
-    # S = [((random.randint(100, 900), random.randint(100, 900)), (random.randint(100, 900), random.randint(100, 900))) for _ in range(10)]
 
-    print(S)
-    I = find_intersections(None)
-    print("intersections")
-    print(I)
-    for i in I:
-        drawPoint(i)
+    S = [((random.randint(0, YSIZE), random.randint(0, YSIZE)), (random.randint(0, YSIZE), random.randint(0, YSIZE))) for _ in range(50)]
+    while True:
+        equalNotFound = True
+        for i, s in enumerate(S):
+            for j, t in enumerate(S[i+1:], start=i+1):
+                if feq(s[0][0], t[0][0]) or feq(s[0][0], t[1][0]):
+                    equalNotFound = False
+                    S[i] = ((float(s[0][0]) + 0.1, s[0][1]), s[1])
+                if feq(s[1][0], t[0][0]) or feq(s[1][0], t[1][0]):
+                    equalNotFound = False
+                    S[i] = (s[0], (float(s[1][0]) + 0.1, s[1][1]))
+        if equalNotFound:
+            break
+
+    # print(S)
+    # I = find_intersections(None)
+    # print("intersections")
+    # print(I)
+    # for i in I:
+    #     drawPoint(i)
+    # print(len(I))
     drawSegments(S)
 
     root.mainloop()
