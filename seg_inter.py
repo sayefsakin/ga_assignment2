@@ -58,13 +58,13 @@ def intersect(p1, p2, p3, p4):
     d4 = is_left(p3, p4, p2)
     if (d1*d2) < 0 and (d3*d4) < 0:
         return True
-    elif feq(d1, 0) and on_segment(p1, p2, p3):
+    elif feq(d1, 0.0) and on_segment(p1, p2, p3):
         return True
-    elif feq(d2, 0) and on_segment(p1, p2, p4):
+    elif feq(d2, 0.0) and on_segment(p1, p2, p4):
         return True
-    elif feq(d3, 0) and on_segment(p3, p4, p1):
+    elif feq(d3, 0.0) and on_segment(p3, p4, p1):
         return True
-    elif feq(d4, 0) and on_segment(p3, p4, p2):
+    elif feq(d4, 0.0) and on_segment(p3, p4, p2):
         return True
     return False
 
@@ -97,8 +97,9 @@ def find_intersections(event):
     Q = RedBlackTree()
     label = 0
     for s in S:
+        S[label] = ((float(s[0][0]), float(s[0][1])), (float(s[1][0]), float(s[1][1])))
         if s[0][0] > s[1][0]:
-            S[label] = (s[1], s[0])
+            S[label] = ((float(s[1][0]), float(s[1][1])), (float(s[0][0]), float(s[0][1])))
             s = S[label]
         Q.insert(s[0][0], Event(s[0][0], s[0][1], True, False, s[1], label))
         Q.insert(s[1][0], Event(s[1][0], s[1][1], False, False, s[0], label))
@@ -134,6 +135,7 @@ def find_intersections(event):
         elif not event.is_intersection:
             # print("right event")
             node = T.searchx(T.root, event.label)
+            # node = T.searchx(event.label, S[event.label], event.x)
             if node:
                 pred = T.predecessor(node)
                 succ = T.successor(node)
@@ -141,24 +143,28 @@ def find_intersections(event):
                     int_pnt = intersection_point(succ.data[0], succ.data[1], pred.data[0], pred.data[1])
                     Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, succ.key, None))
                 T.delete(node)
+            else:
+                print('right endpoint node not found')
 
         else:
             # print("intersection event")
             intersections.append((event.x, event.y))
             n1 = T.searchx(T.root, event.plabel)
             n2 = T.searchx(T.root, event.slabel)
+            # n1 = T.searchx(event.plabel, S[event.plabel], event.x)
+            # n2 = T.searchx(event.slabel, S[event.slabel], event.x)
             if n1 and n2:
-                T.swap(n1, n2)
+                T.swap(n1, n2, event.x)
             if n1:
                 pred = T.predecessor(n1)
                 if pred and intersect(n1.data[0], n1.data[1], pred.data[0], pred.data[1]):
                     int_pnt = intersection_point(n1.data[0], n1.data[1], pred.data[0], pred.data[1])
-                    Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, event.label, None))
+                    Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, event.slabel, None))
             if n2:
                 succ = T.successor(n2)
                 if succ and intersect(n2.data[0], n2.data[1], succ.data[0], succ.data[1]):
                     int_pnt = intersection_point(n2.data[0], n2.data[1], succ.data[0], succ.data[1])
-                    Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, event.label, None, succ.key, None))
+                    Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, event.plabel, None, succ.key, None))
             if n1 and succ and intersect(succ.data[0], succ.data[1], n1.data[0], n1.data[1]):
                 int_pnt = intersection_point(succ.data[0], succ.data[1], n1.data[0], n1.data[1])
                 int_node = Q.search(int_pnt[0])
@@ -196,7 +202,11 @@ if __name__ == "__main__":
     canvas.bind("<Button-1>", find_intersections)
     canvas.grid(row=0, column=0)
 
-    S = [((100, 300), (850, 400)), ((300, 250), (700, 600)), ((200, 500), (900, 300)), ((280, 350), (300, 900))]
+    # S = [((100, 300), (850, 400)), ((290, 250), (700, 600)), ((200, 500), (900, 300)), ((280, 350), (300, 900)), ((320, 870), (400, 550))]
+    # S = [((100, 300), (850, 400)), ((290, 250), (700, 600)), ((200, 500), (900, 300)), ((280, 350), (300, 900))]
+    S = [((100, 300), (850, 400)), ((290, 250), (700, 600)), ((200, 500), (900, 300))]
+    # S = [((742, 655), (412, 440)), ((776, 786), (495, 339)), ((402, 598), (469, 124)), ((869, 481), (888, 806)), ((230, 154), (433, 773)), ((439, 366), (816,785)), ((593, 391), (887, 346)), ((855, 859), (444, 683)), ((531, 523), (242, 817)), ((357, 870), (700, 658))]
+    # S = [((439, 366), (816,785)), ((855, 859), (444, 683)), ((357, 870), (700, 658))]
     # S = [((random.randint(100, 900), random.randint(100, 900)), (random.randint(100, 900), random.randint(100, 900))) for _ in range(10)]
 
     print(S)
