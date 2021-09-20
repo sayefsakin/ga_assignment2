@@ -7,7 +7,6 @@ import copy
 
 YSIZE = 1000
 PSIZE = 4
-EPS = 0.0000000001
 
 # -----------------------------------------------------------------
 # Event class for endpts and intersection pts in our event queue
@@ -35,8 +34,6 @@ class Event:
 # -----------------------------------------------------------------
 # checks if line segment p1p2 and p3p4 intersect
 # -----------------------------------------------------------------
-def feq(a, b):
-    return (a-b) < EPS
 
 
 def dist(a, b):
@@ -131,7 +128,7 @@ def find_intersections(event):
             if pred and succ and intersect(succ.data[0], succ.data[1], pred.data[0], pred.data[1]):
                 int_pnt = intersection_point(succ.data[0], succ.data[1], pred.data[0], pred.data[1])
                 int_node = Q.search(int_pnt[0])
-                if int_node and feq(int_node[1], int_pnt[1]):
+                if int_node and feq(int_node.data.y, int_pnt[1]):
                     Q.delete(int_node)
 
         elif not event.is_intersection:
@@ -165,12 +162,12 @@ def find_intersections(event):
             if n1 and succ and intersect(succ.data[0], succ.data[1], n1.data[0], n1.data[1]):
                 int_pnt = intersection_point(succ.data[0], succ.data[1], n1.data[0], n1.data[1])
                 int_node = Q.search(int_pnt[0])
-                if int_node and feq(int_node[1], int_pnt[1]):
+                if int_node and feq(int_node.data.y, int_pnt[1]):
                     Q.delete(int_node)
             if pred and n2 and intersect(n2.data[0], n2.data[1], pred.data[0], pred.data[1]):
                 int_pnt = intersection_point(n2.data[0], n2.data[1], pred.data[0], pred.data[1])
                 int_node = Q.search(int_pnt[0])
-                if int_node and feq(int_node[1], int_pnt[1]):
+                if int_node and feq(int_node.data.y, int_pnt[1]):
                     Q.delete(int_node)
     return intersections
 
@@ -199,8 +196,8 @@ if __name__ == "__main__":
     canvas.bind("<Button-1>", find_intersections)
     canvas.grid(row=0, column=0)
 
-    # S = [((50, 50), (600, 300)), ((200, 800), (550, 100))]
-    S = [((random.randint(100, 900), random.randint(100, 900)), (random.randint(100, 900), random.randint(100, 900))) for _ in range(10)]
+    S = [((100, 300), (850, 400)), ((300, 250), (700, 600)), ((200, 500), (900, 300)), ((280, 350), (300, 900))]
+    # S = [((random.randint(100, 900), random.randint(100, 900)), (random.randint(100, 900), random.randint(100, 900))) for _ in range(10)]
 
     print(S)
     I = find_intersections(None)

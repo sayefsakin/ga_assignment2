@@ -1,6 +1,9 @@
 RED = True
 BLACK = False
+EPS = 0.0000000001
 
+def feq(a, b):
+    return (a-b) < EPS
 
 class Node:
     def __init__(self, key, data=None, color=RED):
@@ -94,7 +97,7 @@ class RedBlackTree:
 
     def search(self, key, x=None):
         if x is None: x = self.root
-        while x:  # and x.key != key:
+        while x and feq(x.key, key) is False:
             if key < x.key:
                 x = x.left
             else:
