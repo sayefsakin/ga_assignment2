@@ -170,34 +170,92 @@ class RedBlackTree:
     def Above(self, s1, s2, x):
         return self.yIntercept(s1, x) < self.yIntercept(s2, x)
 
-    def searchx(self, key, data, xcoord):
-        x = self.root
-        # *** need to implement ***
+    def searchx(self, x, key):
         # fn used to search for a segment (data)
-        return x
 
-    def swap(self, nn1, nn2, x):
-        print('swap')
-        # *** need to implement ***
+        if x.key == key:
+            return x
+        l = None
+        if x.left:
+            l = self.searchx(x.left, key)
+        if l is None and x.right:
+            return self.searchx(x.right, key)
+        return l
+
+    def swap(self, nn1, nn2):
         # fn used to swap two nodes in the tree
+        temp = Node(nn1.key, nn1.data)
+        temp.left = nn2.left
+        temp.right = nn2.right
+        temp.color = nn2.color
+        temp.parent = nn2.parent
+
+        nn1p = nn1.parent
+        nn2p = nn2.parent
+
+        if nn2p.left and nn2p.left.key == nn2.key:
+            nn2p.left = temp
+        else:
+            nn2p.right = temp
+
+        temp2 = Node(nn2.key, nn2.data)
+        temp2.left = nn1.left
+        temp2.right = nn1.right
+        temp2.color = nn1.color
+        temp2.parent = nn1.parent
+
+        if nn1p.left and nn1p.left.key == nn1.key:
+            nn1p.left = temp2
+        else:
+            nn1p.right = temp2
 
     def insert_segment(self, label, segment):
         # fn used to insert a segment into the tree
         # considering this function will be called always from the left end point of a segment
-        print('insert_segment label, segment: ', label, segment)
         x = Node(label, segment)
 
-        self.__insert_helper(x)
+        self.__insert_helperx(x)
 
         x.color = RED
+        ret = x
+        while x != self.root and x.parent.color == RED:
+            if x.parent == x.parent.parent.left:
+                y = x.parent.parent.right
+                if y and y.color == RED:
+                    x.parent.color = BLACK
+                    y.color = BLACK
+                    x.parent.parent.color = RED
+                    x = x.parent.parent
+                else:
+                    if x == x.parent.right:
+                        x = x.parent
+                        self.__left_rotate(x)
+                    x.parent.color = BLACK
+                    x.parent.parent.color = RED
+                    self.__right_rotate(x.parent.parent)
+            else:
+                y = x.parent.parent.left
+                if y and y.color == RED:
+                    x.parent.color = BLACK
+                    y.color = BLACK
+                    x.parent.parent.color = RED
+                    x = x.parent.parent
+                else:
+                    if x == x.parent.left:
+                        x = x.parent
+                        self.__right_rotate(x)
+                    x.parent.color = BLACK
+                    x.parent.parent.color = RED
+                    self.__left_rotate(x.parent.parent)
+        self.root.color = BLACK
+        return ret
 
     def __insert_helperx(self, z):
-        print('__insert_helperx')
         y = NilNode.instance()
         x = self.root
         while x:  # and x.key != z.key: consider this checking later on, equal or left is considered as predecessor now
             y = x
-            if self.Above(z, x, z[0][0]):
+            if self.Above(z.data, x.data, z.data[0][0]):
                 x = x.left
             else:
                 x = x.right
@@ -208,7 +266,7 @@ class RedBlackTree:
         if not y:
             self.root = z
         else:
-            if self.Above(z, y, z[0][0]):
+            if self.Above(z.data, y.data, z.data[0][0]):
                 y.left = z
             else:
                 y.right = z
@@ -329,13 +387,25 @@ class RedBlackTree:
 
 if __name__ == "__main__":
     tree = RedBlackTree()
-    tree.insert(20)
-    tree.insert(15)
-    tree.insert(10)
-    tree.insert(7)
-    tree.insert(4)
-    tree.insert(3)
+    # tree.insert(20)
+    # tree.insert(15)
+    # tree.insert(10)
+    # tree.insert(7)
+    # tree.insert(4)
+    # tree.insert(3)
+    #
+    # print(tree.black_height())
+    # for key in tree.inorder():
+    #     print("key = %s" % key)
+    a = tree.insert_segment(0, ((0, 0), (50, 10)))
+    b = tree.insert_segment(1, ((20, 20), (60, 0)))
+    c = tree.insert_segment(2, ((25, 10), (45, 30)))
+    b = tree.insert_segment(3, ((26, -20), (65, -5)))
+    pred = tree.predecessor(a)
 
-    print(tree.black_height())
-    for key in tree.inorder():
-        print("key = %s" % key)
+    print('predecessor')
+    print(pred.key)
+    s = tree.searchx(tree.root, 4)
+    print("searchx")
+    print(s.data)
+
