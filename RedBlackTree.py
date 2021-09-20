@@ -163,11 +163,12 @@ class RedBlackTree:
         self.size += 1
 
     # *** extra functions for segments
+    def yIntercept(self, s, x):
+        return ((s[0][1] - s[1][1]) * (x - s[0][0]) / (s[0][0] - s[1][0])) + s[0][1]
 
+    # True if at x s1[y] < s2[y]
     def Above(self, s1, s2, x):
-        # *** need to implement ***
-        # fn used in searchx
-        return False
+        return self.yIntercept(s1, x) < self.yIntercept(s2, x)
 
     def searchx(self, key, data, xcoord):
         x = self.root
@@ -181,14 +182,38 @@ class RedBlackTree:
         # fn used to swap two nodes in the tree
 
     def insert_segment(self, label, segment):
-        # *** need to implement ***
         # fn used to insert a segment into the tree
-        print('insert_segment')
+        # considering this function will be called always from the left end point of a segment
+        print('insert_segment label, segment: ', label, segment)
+        x = Node(label, segment)
+
+        self.__insert_helper(x)
+
+        x.color = RED
 
     def __insert_helperx(self, z):
-        # *** need to implement ***
-        # fn used by insert_segment
         print('__insert_helperx')
+        y = NilNode.instance()
+        x = self.root
+        while x:  # and x.key != z.key: consider this checking later on, equal or left is considered as predecessor now
+            y = x
+            if self.Above(z, x, z[0][0]):
+                x = x.left
+            else:
+                x = x.right
+
+        # if z.key == y.key or z.key == x.key: return
+
+        z.parent = y
+        if not y:
+            self.root = z
+        else:
+            if self.Above(z, y, z[0][0]):
+                y.left = z
+            else:
+                y.right = z
+
+        self.size += 1
 
     # *** ---------------------------
 
