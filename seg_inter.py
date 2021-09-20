@@ -137,7 +137,6 @@ def find_intersections(event):
         elif not event.is_intersection:
             # print("right event")
             node = T.searchx(T.root, event.label)
-            # node = T.searchx(event.label, S[event.label], event.x)
             if node:
                 pred = T.predecessor(node)
                 succ = T.successor(node)
@@ -154,10 +153,8 @@ def find_intersections(event):
             intersections.append((event.x, event.y))
             n1 = T.searchx(T.root, event.plabel)
             n2 = T.searchx(T.root, event.slabel)
-            # n1 = T.searchx(event.plabel, S[event.plabel], event.x)
-            # n2 = T.searchx(event.slabel, S[event.slabel], event.x)
             if n1 and n2:
-                T.swap(n1, n2, event.x)
+                T.swap(n1, n2)
             if n1:
                 pred = T.predecessor(n1)
                 if pred and intersect(n1.data[0], n1.data[1], pred.data[0], pred.data[1]):
@@ -207,12 +204,12 @@ if __name__ == "__main__":
     canvas.bind("<Button-1>", find_intersections)
     canvas.grid(row=0, column=0)
 
-    # S = [((100, 300), (850, 400)), ((290, 250), (700, 600)), ((200, 500), (900, 300)), ((280, 350), (300, 900)), ((320, 870), (400, 550))]
+    S = [((100, 300), (850, 400)), ((290, 250), (700, 600)), ((200, 500), (900, 300)), ((280, 350), (300, 900)), ((320, 870), (400, 550))]
     # S = [((100, 300), (850, 400)), ((290, 250), (700, 600)), ((200, 500), (900, 300)), ((280, 350), (300, 900))]
     # S = [((100, 300), (850, 400)), ((290, 250), (700, 600)), ((200, 500), (900, 300))]
     # S = [((742, 655), (412, 440)), ((776, 786), (495, 339)), ((402, 598), (469, 124)), ((869, 481), (888, 806)), ((230, 154), (433, 773)), ((439, 366), (816,785)), ((593, 391), (887, 346)), ((855, 859), (444, 683)), ((531, 523), (242, 817)), ((357, 870), (700, 658))]
     # S = [((439, 366), (816,785)), ((855, 859), (444, 683)), ((357, 870), (700, 658))]
-    S = [((random.randint(100, 900), random.randint(100, 900)), (random.randint(100, 900), random.randint(100, 900))) for _ in range(10)]
+    # S = [((random.randint(100, 900), random.randint(100, 900)), (random.randint(100, 900), random.randint(100, 900))) for _ in range(10)]
 
     print(S)
     I = find_intersections(None)

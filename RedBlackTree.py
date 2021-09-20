@@ -175,16 +175,6 @@ class RedBlackTree:
     def Above(self, s1, s2, x):
         return self.yIntercept(s1, x) < self.yIntercept(s2, x)
 
-    # def searchx(self, key, data, xcoord):
-    #     x = self.root
-    #     while x and x.key != key:
-    #         if self.Above(data, x.data, xcoord):
-    #             x = x.left
-    #         else:
-    #             x = x.right
-    #     return x
-
-
     def searchx(self, x, key):
         # fn used to search for a segment (data)
 
@@ -197,7 +187,7 @@ class RedBlackTree:
             return self.searchx(x.right, key)
         return l
 
-    def swap(self, nn1, nn2, x):
+    def swap(self, nn1, nn2):
         # fn used to swap two nodes in the tree
         tempKey = nn1.key
         tempData = nn1.data
