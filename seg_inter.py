@@ -91,12 +91,21 @@ def intersection_point(p1, p2, p3, p4):
     y = ((c1*a2) - (c2*a1)) / ((a1*b2) - (a2*b1))
     return (x, y)
 
+
 # -----------------------------------------------------------------
 # find_intersections callback
 # -----------------------------------------------------------------
-def find_intersections(clickEvent):
+def find_intersections_wrapper(clickEvent):
     global S
+    intersections = find_intersections(S)
+    if clickEvent is not None:
+        for ip in intersections:
+            drawPoint(ip)
+
+
+def find_intersections(S):
     Q = RedBlackTree()
+    S = makeSegmentXDistinct(S)
     label = 0
     for s in S:
         S[label] = ((float(s[0][0]), float(s[0][1])), (float(s[1][0]), float(s[1][1])))
@@ -179,10 +188,6 @@ def find_intersections(clickEvent):
                 int_node = Q.search(int_pnt[0])
                 if int_node and feq(int_node.data.y, int_pnt[1]):
                     Q.delete(int_node)
-    if clickEvent is not None:
-        for ip in intersections:
-            drawPoint(ip)
-        return None
     return intersections
 
 
@@ -200,22 +205,28 @@ def drawPoint(point):
     p = (point[0], YSIZE - point[1])
     canvas.create_oval(p[0] - PSIZE, p[1] - PSIZE, p[0] + PSIZE, p[1] + PSIZE, fill='red', w=2)
 
+def makeSegmentXDistinct(S):
+    while True:
+        equalNotFound = True
+        for i, s in enumerate(S):
+            if feq(s[0][0], s[1][0]):
+                equalNotFound = False
+                S[i] = ((float(s[0][0]) + 0.9, s[0][1]), s[1])
+            for j, t in enumerate(S[i+1:], start=i+1):
+                if feq(s[0][0], t[0][0]) or feq(s[0][0], t[1][0]):
+                    equalNotFound = False
+                    S[i] = ((float(s[0][0]) + 0.9, s[0][1]), s[1])
+                if feq(s[1][0], t[0][0]) or feq(s[1][0], t[1][0]):
+                    equalNotFound = False
+                    S[i] = (s[0], (float(s[1][0]) + 0.9, s[1][1]))
+        if equalNotFound:
+            break
+    return S
 
 def generateRandomSegments(sc):
     global S
     S = [((random.randint(0, YSIZE), random.randint(0, YSIZE)), (random.randint(0, YSIZE), random.randint(0, YSIZE))) for _ in range(sc)]
-    while True:
-        equalNotFound = True
-        for i, s in enumerate(S):
-            for j, t in enumerate(S[i+1:], start=i+1):
-                if feq(s[0][0], t[0][0]) or feq(s[0][0], t[1][0]):
-                    equalNotFound = False
-                    S[i] = ((float(s[0][0]) + 0.1, s[0][1]), s[1])
-                if feq(s[1][0], t[0][0]) or feq(s[1][0], t[1][0]):
-                    equalNotFound = False
-                    S[i] = (s[0], (float(s[1][0]) + 0.1, s[1][1]))
-        if equalNotFound:
-            break
+    # S = makeSegmentXDistinct(S)
 
 
 def plot_line(x_points, y_points1):
@@ -256,10 +267,10 @@ if __name__ == "__main__":
     root.geometry(str(YSIZE)+'x'+str(YSIZE)) #("800x800")
 
     canvas = Canvas(root, width=YSIZE, height=YSIZE, bg='#FFF', highlightbackground="#999")
-    canvas.bind("<Button-1>", find_intersections)
+    canvas.bind("<Button-1>", find_intersections_wrapper)
     canvas.grid(row=0, column=0)
 
-    generateRandomSegments(10)
+    generateRandomSegments(70)
     drawSegments()
     root.mainloop()
 

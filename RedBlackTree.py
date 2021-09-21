@@ -169,6 +169,8 @@ class RedBlackTree:
 
     # *** extra functions for segments
     def yIntercept(self, s, x):
+        if feq(s[0][0], s[1][0]):
+            print('less than zero ', s[0][0], ' ', s[1][0])
         return ((s[0][1] - s[1][1]) * (x - s[0][0]) / (s[0][0] - s[1][0])) + s[0][1]
 
     # True if at x s1[y] < s2[y]
