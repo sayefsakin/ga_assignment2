@@ -1,5 +1,8 @@
 import math as m
+from tkinter import *
 
+YSIZE = 750
+PSIZE = 4
 
 #------------------------------------------------------------------------
 # Class Vertex
@@ -178,8 +181,26 @@ class DCEL:
               print(e)
       else:
           print("no vertex")
-      
 
+
+# def drawSegments(S):
+#     spacing = 50
+#     scale = 100
+#     for s in S:
+#         p1 = (s[0][0]*scale+spacing, s[0][1]*scale+spacing)
+#         p2 = (s[1][0]*scale+spacing, s[1][1]*scale+spacing)
+#         drawPoint(p1)
+#         drawPoint(p2)
+#         drawLine(p1, p2, 'black')
+#
+# def drawLine(p1, p2, color):
+#     p1 = (p1[0], YSIZE - p1[1])
+#     p2 = (p2[0], YSIZE - p2[1])
+#     canvas.create_line(p1, p2, fill=color)
+#
+# def drawPoint(point):
+#     p = (point[0], YSIZE - point[1])
+#     canvas.create_oval(p[0] - PSIZE, p[1] - PSIZE, p[0] + PSIZE, p[1] + PSIZE, fill='red', w=2)
 
 
 
@@ -198,3 +219,14 @@ if __name__ == "__main__":
     myDCEL.build_dcel(points, segments)
     myDCEL.traverseFace([(3, 0), (0, 5)])
     myDCEL.traverseHalfEdges((0, 5))
+
+
+    root = Tk()
+    root.title("DCEL")
+    root.geometry(str(YSIZE)+'x'+str(YSIZE)) #("800x800")
+
+    canvas = Canvas(root, width=YSIZE, height=YSIZE, bg='#FFF', highlightbackground="#999")
+    canvas.grid(row=0, column=0)
+
+    drawSegments(segments)
+    root.mainloop()

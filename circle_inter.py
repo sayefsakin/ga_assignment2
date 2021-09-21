@@ -1,4 +1,4 @@
-from RedBlackTree import *
+from RedBlackTree2 import *
 from functools import cmp_to_key
 import math 
 import random
@@ -39,7 +39,7 @@ class Event:
 
 
 def dist(a, b):
-    return (a[0]-b[0]) * (a[0]-b[0]) + (a[1]-b[1]) * (a[1]-b[1])
+    return math.sqrt((a[0]-b[0]) * (a[0]-b[0]) + (a[1]-b[1]) * (a[1]-b[1]))
 
 
 def is_left(a, b, c):
@@ -53,22 +53,13 @@ def on_segment(a, b, c):
     return False
 
 
-def intersect(p1, p2, p3, p4):
-    d1 = is_left(p1, p2, p3)
-    d2 = is_left(p1, p2, p4)
-    d3 = is_left(p3, p4, p1)
-    d4 = is_left(p3, p4, p2)
-    if (d1*d2) < 0 and (d3*d4) < 0:
-        return True
-    elif feq(d1, 0.0) and on_segment(p1, p2, p3):
-        return True
-    elif feq(d2, 0.0) and on_segment(p1, p2, p4):
-        return True
-    elif feq(d3, 0.0) and on_segment(p3, p4, p1):
-        return True
-    elif feq(d4, 0.0) and on_segment(p3, p4, p2):
-        return True
-    return False
+def intersect(arc1, arc2):
+    d = dist(arc1.data[0], arc2.data[0])
+    if d > arc1.data[1] + arc2.data[1]:
+        return False
+    if d < abs(arc1.data[1] - arc2.data[1]):
+        return False
+    return True
 
 
 def getA(p1, p2):
@@ -80,7 +71,7 @@ def getB(p1, p2):
 def getC(p1, p2):
     return (p1[0] * p2[1]) - (p2[0] * p1[1])
 
-def intersection_point(p1, p2, p3, p4):
+def intersection_point_in_segmetns(p1, p2, p3, p4):
     a1 = getA(p1, p2)
     b1 = getB(p1, p2)
     c1 = getC(p1, p2)
@@ -91,23 +82,26 @@ def intersection_point(p1, p2, p3, p4):
     y = ((c1*a2) - (c2*a1)) / ((a1*b2) - (a2*b1))
     return (x, y)
 
+def intersection_point(arc1, arc2):
+    d = dist(arc1.data[0], arc2.data[0])
+    if feq(d, (arc1.data[1] + arc2.data[1])):
+        x = arc1.data[0][0]
+        return intersection_point_in_segmetns(arc1.data[0])
+
 # -----------------------------------------------------------------
 # find_intersections callback
 # -----------------------------------------------------------------
 def find_intersections(clickEvent):
     global S
-    Q = RedBlackTree()
+    Q = RedBlackTree2()
     label = 0
     for s in S:
-        S[label] = ((float(s[0][0]), float(s[0][1])), (float(s[1][0]), float(s[1][1])))
-        if s[0][0] > s[1][0]:
-            S[label] = ((float(s[1][0]), float(s[1][1])), (float(s[0][0]), float(s[0][1])))
-            s = S[label]
-        Q.insert(s[0][0], Event(s[0][0], s[0][1], True, False, s[1], label))
-        Q.insert(s[1][0], Event(s[1][0], s[1][1], False, False, s[0], label))
+        S[label] = ((float(s[0][0]), float(s[0][1])), float(s[1]))
+        Q.insert(s[0][0], Event(s[0][0] - s[1], s[0][1], True, False, s[1], label))  # other_end is radius
+        Q.insert(s[1][0], Event(s[1][0] + s[1], s[1][1], False, False, s[1], label))  # other_end is radius
         label += 1
   
-    T = RedBlackTree()
+    T = RedBlackTree2()
     
     intersections = []
     
@@ -117,10 +111,11 @@ def find_intersections(clickEvent):
         Q.delete(min_node)
         if event.is_left:
             # print("left event")
-            node = T.insert_segment(event.label, S[event.label])
+            node = T.insert_segment(str(event.label) + '_top', S[event.label])
+            # node = T.insert_segment(str(event.label) + '_top', S[event.label])
             pred = T.predecessor(node)
-            if pred and intersect(node.data[0], node.data[1], pred.data[0], pred.data[1]):
-                int_pnt = intersection_point(node.data[0], node.data[1], pred.data[0], pred.data[1])
+            if pred and intersect(node, pred):
+                int_pnt = intersection_point(node, pred)
                 if int_pnt[0] > event.x:
                     Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, event.label, None))
                 # check for the other parameters in the event object
@@ -186,10 +181,19 @@ def find_intersections(clickEvent):
     return intersections
 
 
-def drawSegments():
+def drawCircles():
     global S
     for s in S:
-        drawLine(s[0], s[1], 'black')
+        drawPoint(s[0])
+        # drawLine(s[0], s[1], 'black')
+        create_circle(s[0][0], s[0][1], s[1])
+
+def create_circle(x, y, r): #center coordinates, radius
+    x0 = x - r
+    y0 = y - r
+    x1 = x + r
+    y1 = y + r
+    return canvas.create_oval(x0, YSIZE - y0, x1, YSIZE - y1)
 
 def drawLine(p1, p2, color):
     p1 = (p1[0], YSIZE - p1[1])
@@ -201,21 +205,12 @@ def drawPoint(point):
     canvas.create_oval(p[0] - PSIZE, p[1] - PSIZE, p[0] + PSIZE, p[1] + PSIZE, fill='red', w=2)
 
 
-def generateRandomSegments(sc):
+def generateRandomCircles(sc):
     global S
-    S = [((random.randint(0, YSIZE), random.randint(0, YSIZE)), (random.randint(0, YSIZE), random.randint(0, YSIZE))) for _ in range(sc)]
-    while True:
-        equalNotFound = True
-        for i, s in enumerate(S):
-            for j, t in enumerate(S[i+1:], start=i+1):
-                if feq(s[0][0], t[0][0]) or feq(s[0][0], t[1][0]):
-                    equalNotFound = False
-                    S[i] = ((float(s[0][0]) + 0.1, s[0][1]), s[1])
-                if feq(s[1][0], t[0][0]) or feq(s[1][0], t[1][0]):
-                    equalNotFound = False
-                    S[i] = (s[0], (float(s[1][0]) + 0.1, s[1][1]))
-        if equalNotFound:
-            break
+    minRadius = 30
+    maxRadius = 80
+    S = [((random.randint(minRadius, YSIZE - minRadius), random.randint(minRadius, YSIZE-minRadius)), random.randint(minRadius, maxRadius)) for _ in range(sc)]
+
 
 
 def plot_line(x_points, y_points1):
@@ -256,11 +251,12 @@ if __name__ == "__main__":
     root.geometry(str(YSIZE)+'x'+str(YSIZE)) #("800x800")
 
     canvas = Canvas(root, width=YSIZE, height=YSIZE, bg='#FFF', highlightbackground="#999")
-    canvas.bind("<Button-1>", find_intersections)
+    # canvas.bind("<Button-1>", find_intersections)
     canvas.grid(row=0, column=0)
 
-    generateRandomSegments(10)
-    drawSegments()
+    generateRandomCircles(5)
+    drawCircles()
+    I = find_intersections(None)
     root.mainloop()
 
     # estimateTime()
