@@ -3,7 +3,9 @@ from functools import cmp_to_key
 import math 
 import random
 from tkinter import *
+from datetime import datetime
 import copy
+import matplotlib.pyplot as plt
 
 YSIZE = 750
 PSIZE = 4
@@ -92,7 +94,7 @@ def intersection_point(p1, p2, p3, p4):
 # -----------------------------------------------------------------
 # find_intersections callback
 # -----------------------------------------------------------------
-def find_intersections(event):
+def find_intersections(clickEvent):
     global S
     Q = RedBlackTree()
     label = 0
@@ -177,37 +179,31 @@ def find_intersections(event):
                 int_node = Q.search(int_pnt[0])
                 if int_node and feq(int_node.data.y, int_pnt[1]):
                     Q.delete(int_node)
-    for ip in intersections:
-        drawPoint(ip)
-    # return intersections
+    if clickEvent is not None:
+        for ip in intersections:
+            drawPoint(ip)
+        return None
+    return intersections
 
 
-def drawSegments(S):
-    for s in S:
-        drawLine(s[0], s[1], 'black')
-
-def drawLine(p1, p2, color):
-    p1 = (p1[0], YSIZE - p1[1])
-    p2 = (p2[0], YSIZE - p2[1])
-    canvas.create_line(p1, p2, fill=color)
-
-def drawPoint(point):
-    p = (point[0], YSIZE - point[1])
-    canvas.create_oval(p[0] - PSIZE, p[1] - PSIZE, p[0] + PSIZE, p[1] + PSIZE, fill='red', w=2)
-
-
-if __name__ == "__main__":
-    # =========================================
-    root = Tk()
-    root.title("Segments")
-    root.geometry(str(YSIZE)+'x'+str(YSIZE)) #("800x800")
-
-    canvas = Canvas(root, width=YSIZE, height=YSIZE, bg='#FFF', highlightbackground="#999")
-    canvas.bind("<Button-1>", find_intersections)
-    canvas.grid(row=0, column=0)
+# def drawSegments():
+#     global S
+#     for s in S:
+#         drawLine(s[0], s[1], 'black')
+#
+# def drawLine(p1, p2, color):
+#     p1 = (p1[0], YSIZE - p1[1])
+#     p2 = (p2[0], YSIZE - p2[1])
+#     canvas.create_line(p1, p2, fill=color)
+#
+# def drawPoint(point):
+#     p = (point[0], YSIZE - point[1])
+#     canvas.create_oval(p[0] - PSIZE, p[1] - PSIZE, p[0] + PSIZE, p[1] + PSIZE, fill='red', w=2)
 
 
-    S = [((random.randint(0, YSIZE), random.randint(0, YSIZE)), (random.randint(0, YSIZE), random.randint(0, YSIZE))) for _ in range(50)]
+def generateRandomSegments(sc):
+    global S
+    S = [((random.randint(0, YSIZE), random.randint(0, YSIZE)), (random.randint(0, YSIZE), random.randint(0, YSIZE))) for _ in range(sc)]
     while True:
         equalNotFound = True
         for i, s in enumerate(S):
@@ -221,13 +217,51 @@ if __name__ == "__main__":
         if equalNotFound:
             break
 
-    # print(S)
-    # I = find_intersections(None)
-    # print("intersections")
-    # print(I)
-    # for i in I:
-    #     drawPoint(i)
-    # print(len(I))
-    drawSegments(S)
 
-    root.mainloop()
+def plot_line(x_points, y_points1):
+    plt.plot(x_points, y_points1, color='green', label='output-time')
+    # plt.plot(x_points, y_points2, color="red", label="Andrews Scan")
+    # plt.plot(x_points, y_points3, color="blue", label="Divide and Conquer")
+    spacing = 50
+    plt.xlim([min(x_points) - spacing, max(x_points) + spacing])
+    plt.title('Bentley-Ottmann')
+    plt.xlabel('Number of Intersections')
+    plt.ylabel('Time (ms)')
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+
+def estimateTime():
+    max_points = 20  # np.geomspace(50, 1000, 10, endpoint=True)
+    cp_bf_x = list()
+    cp_bf_y = list()
+    cp = list()
+    for n_points in range(max_points):
+        generateRandomSegments(50)
+        begin_time = datetime.now().timestamp() * 1000
+        I = find_intersections(None)
+        time_taken = (datetime.now().timestamp() * 1000) - begin_time
+        cp_bf_y.append(time_taken)
+        cp_bf_x.append(len(I))
+        cp.append({'time': time_taken, 'ip': len(I)})
+    cp = sorted(cp, key=lambda x: x['ip'])
+    plot_line([d['ip'] for d in cp], [d['time'] for d in cp])
+
+
+
+if __name__ == "__main__":
+    # =========================================
+    # root = Tk()
+    # root.title("Segments")
+    # root.geometry(str(YSIZE)+'x'+str(YSIZE)) #("800x800")
+    #
+    # canvas = Canvas(root, width=YSIZE, height=YSIZE, bg='#FFF', highlightbackground="#999")
+    # canvas.bind("<Button-1>", find_intersections)
+    # canvas.grid(row=0, column=0)
+    #
+    # generateRandomSegments(10)
+    # drawSegments()
+    # root.mainloop()
+
+    estimateTime()
