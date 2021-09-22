@@ -182,25 +182,103 @@ class DCEL:
       else:
           print("no vertex")
 
+  # insert vertex p in edge with endpoints v1 and v2, v3 and v4
+  def addNewVertex(self, p, v1, v2, v3, v4):
+      x = Vertex(p[0], p[1])
+      self.vertices.append(x)
 
-# def drawSegments(S):
-#     spacing = 50
-#     scale = 100
-#     for s in S:
-#         p1 = (s[0][0]*scale+spacing, s[0][1]*scale+spacing)
-#         p2 = (s[1][0]*scale+spacing, s[1][1]*scale+spacing)
-#         drawPoint(p1)
-#         drawPoint(p2)
-#         drawLine(p1, p2, 'black')
-#
-# def drawLine(p1, p2, color):
-#     p1 = (p1[0], YSIZE - p1[1])
-#     p2 = (p2[0], YSIZE - p2[1])
-#     canvas.create_line(p1, p2, fill=color)
-#
-# def drawPoint(point):
-#     p = (point[0], YSIZE - point[1])
-#     canvas.create_oval(p[0] - PSIZE, p[1] - PSIZE, p[0] + PSIZE, p[1] + PSIZE, fill='red', w=2)
+      def addDirectedEdges(t1, t2):
+        c12 = self.findHalfEdge(t1, t2)
+        if c12 is None:
+            print('non found')
+        p1 = self.findVertex(t1[0], t1[1])
+        p2 = self.findVertex(t2[0], t2[1])
+        c12pp = Hedge(p1, x)
+        c12p = Hedge(x, p2)
+        self.hedges.append(c12p)
+        self.hedges.append(c12pp)
+        x.hedges.append(c12p)
+        p1.hedges.append(c12pp)
+
+        c12p.next = c12.next
+        c12p.prev = c12pp
+        c12p.face = c12.face
+
+        c12pp.next = c12p
+        c12pp.prev = c12.prev
+        c12pp.face = c12.face
+
+        e_prev = c12.prev
+        e_prev.next = c12pp
+        e_next = c12.next
+        e_next.prev = c12p
+
+        if c12p.face.halfEdge == c12:
+            c12p.face.halfEdge = c12p
+        return c12p, c12pp, c12
+
+      # for v1 and v2
+      e12p, e12pp, e12 = addDirectedEdges(v1, v2)
+      e11pp, e11p, e11 = addDirectedEdges(v2, v1)
+      e12p.twin = e11p
+      e11p.twin = e12p
+      e12pp.twin = e11pp
+      e11pp.twin = e12pp
+
+      self.hedges.remove(e12)
+      self.hedges.remove(e11)
+
+      # for v3 and v4
+      f12p, f12pp, f12 = addDirectedEdges(v3, v4)
+      f11pp, f11p, f11 = addDirectedEdges(v4, v3)
+      f12p.twin = f11p
+      f11p.twin = f12p
+      f12pp.twin = f11pp
+      f11pp.twin = f12pp
+
+      self.hedges.remove(f12)
+      self.hedges.remove(f11)
+
+      f12pp.next = e11pp
+      e11pp.prev = f12pp
+      e12pp.next = f12p
+      f12p.prev = e12pp
+      f11p.next = e12p
+      e12p.prev = f11p
+      e11p.next = f11pp
+      f11pp.prev = e11p
+
+  def updateFaces(self):
+      # clear old faces
+      for halfEdge in self.hedges:
+          halfEdge.face = None
+      self.faces.clear()
+
+      # add new faces
+      faceCount = 0
+      for halfEdge in self.hedges:
+          if halfEdge.face == None:
+              faceCount += 1
+
+              f = Face()
+              f.name = "f" + str(faceCount)
+
+              f.halfEdge = halfEdge
+              halfEdge.face = f
+
+              h = halfEdge
+              while (not h.next == halfEdge):
+                  h.face = f
+                  h = h.next
+              h.face = f
+
+              self.faces.append(f)
+
+
+
+
+
+
 
 
 

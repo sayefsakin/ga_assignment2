@@ -100,7 +100,7 @@ def find_intersections_wrapper(clickEvent):
     intersections = find_intersections(S)
     if clickEvent is not None:
         for ip in intersections:
-            drawPoint(ip)
+            drawPoint(ip[0])
 
 
 def find_intersections(S):
@@ -119,6 +119,7 @@ def find_intersections(S):
     T = RedBlackTree()
     
     intersections = []
+    intersected_segments = []
     
     while not Q.is_empty():
         min_node = Q.minimum()
@@ -161,7 +162,7 @@ def find_intersections(S):
 
         else:
             # print("intersection event")
-            intersections.append((event.x, event.y))
+            intersections.append([(event.x, event.y), S[event.plabel], S[event.slabel]])
             n1 = T.searchx(T.root, event.plabel)
             n2 = T.searchx(T.root, event.slabel)
             if n1 and n2:
