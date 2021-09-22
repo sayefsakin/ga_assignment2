@@ -11,9 +11,16 @@ YSIZE = 1000
 PSIZE = 4
 colors = ['red', 'green', 'blue', 'yellow']
 color_idx = 0
-
+isFirstClick = False
+root = None
 
 def find_intersections(event):
+    global isFirstClick
+    global root
+    if isFirstClick is True:
+        root.destroy()
+        return
+    isFirstClick = True
     global myDCEL
     distinct_seg_sets = []
     plain_seg = []
@@ -53,7 +60,7 @@ def find_intersections(event):
     find_inters(distinct_seg_sets)
     for ep in original_vertics:
         drawPoint((ep.x, ep.y))
-    # drawSegments(plain_seg)
+    drawSegments(plain_seg)
     # find_inters(plain_seg)
 
 def find_inters(dis_S):
@@ -154,6 +161,7 @@ def makeRandomSegment(sc, spacing=50):
 
 if __name__ == "__main__":
     # =========================================
+    isFirstClick = False
     root = Tk()
     root.title("DCEL Test")
     root.geometry(str(YSIZE)+'x'+str(YSIZE)) #("800x800")
@@ -185,30 +193,44 @@ if __name__ == "__main__":
     #       [ P1[3], P1[4]],
     #       [ P1[4], P1[0]],
     #     ]
-    P1 = [(100, 500), (400, 800), (600, 200), (110, 100)]
-
-    S1 = [[ P1[0], P1[1]],
-         [ P1[1], P1[2]],
-         [ P1[2], P1[3]],
-         [ P1[3], P1[0]],
-        ]
+    # P1 = [(100, 500), (400, 800), (600, 200), (110, 100)]
+    #
+    # S1 = [[ P1[0], P1[1]],
+    #      [ P1[1], P1[2]],
+    #      [ P1[2], P1[3]],
+    #      [ P1[3], P1[0]],
+    #     ]
 
     # myDCEL = DCEL()
     # myDCEL.build_dcel(P1, S1)
     #drawFaces(myDCEL)
 
 
-    P2 = [(500, 900), (700, 800), (350, 100), (200, 500)]
-
-    S2 = [[ P2[0], P2[1]],
-         [ P2[1], P2[2]],
-         [ P2[2], P2[3]],
-         [ P2[3], P2[0]],
-        ]
+    # P2 = [(500, 900), (700, 800), (350, 100), (200, 500)]
+    #
+    # S2 = [[ P2[0], P2[1]],
+    #      [ P2[1], P2[2]],
+    #      [ P2[2], P2[3]],
+    #      [ P2[3], P2[0]],
+    #     ]
 
     # myDCEL = DCEL()
     # myDCEL.build_dcel(P2, S2)
     # drawFaces(myDCEL)
+    def makeSegmentsFromPoints(P):
+        S = []
+        for i, p in enumerate(P):
+            next_p = i + 1
+            if next_p >= len(P):
+                next_p = 0
+            S.append([p, P[next_p]])
+        return S
+
+    P1 = [(100, 300), (400, 260), (410, 600), (150, 700), (750, 750), (600, 200), (110, 100)]
+    S1 = makeSegmentsFromPoints(P1)
+    P2 = [(80, 200), (30, 330), (120, 350), (90, 550), (130, 780), (310, 580), (510, 760), (505, 240), (315, 180), (320, 300)]
+    S2 = makeSegmentsFromPoints(P2)
+
     global P3
     global S3
 
