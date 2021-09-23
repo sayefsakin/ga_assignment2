@@ -1,3 +1,5 @@
+import math
+
 RED = True
 BLACK = False
 EPS = 0.0000000001
@@ -267,11 +269,21 @@ class RedBlackTree:
     # *** ---------------------------
 
     # *** extra functions for circles
-    # True if at x c1[y] < c2[y]
-    def CircleAbove(self, c1, c2):
-        if c1.data[0][0] == c2.data[0][0] and c1.data[0][1] == c2.data[0][1] and c1.data[1] == c2.data[1]:  # they are the same circle
-            return 'top' in c2.key
-        return c1.data[0][1] < c2.data[0][1]
+    def yInterceptCircle(self, c, x):
+        if (c.data[1]*c.data[1]) < ((x-c.data[0][0])*(x-c.data[0][0])):
+            return c.data[0][1]
+        if '_top' in c.key:
+            return c.data[0][1] + math.sqrt((c.data[1]*c.data[1]) - ((x-c.data[0][0])*(x-c.data[0][0])))
+        return c.data[0][1] - math.sqrt((c.data[1]*c.data[1]) - ((x-c.data[0][0])*(x-c.data[0][0])))
+
+    # True if at x c1[y] < c2[y] (the arcs not the circle)
+    def CircleAbove(self, c1, c2, x):
+        # if c1.data[0][0] == c2.data[0][0] and c1.data[0][1] == c2.data[0][1] and c1.data[1] == c2.data[1]:  # they are the same circle
+        #     return 'top' in c2.key
+        # return c1.data[0][1] < c2.data[0][1]
+        c1i = self.yInterceptCircle(c1, x)
+        c2i = self.yInterceptCircle(c2, x)
+        return feq(c1i, c2i) or c1i < c2i
 
     # def searchx(self, x, key):
     #     # fn used to search for a segment (data)
@@ -342,7 +354,7 @@ class RedBlackTree:
         x = self.root
         while x:  # and x.key != z.key: consider this checking later on, equal or left is considered as predecessor now
             y = x
-            if self.CircleAbove(z, x):
+            if self.CircleAbove(z, x, z.data[0][0] - z.data[1]):
                 x = x.left
             else:
                 x = x.right
@@ -353,7 +365,7 @@ class RedBlackTree:
         if not y:
             self.root = z
         else:
-            if self.CircleAbove(z, x):
+            if self.CircleAbove(z, y, z.data[0][0] - z.data[1]):
                 y.left = z
             else:
                 y.right = z
