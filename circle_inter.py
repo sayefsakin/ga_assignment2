@@ -244,6 +244,24 @@ def estimateTime():
     plot_line([d['ip'] for d in cp], [d['time'] for d in cp])
 
 
+def getCirlceIntersection(c1, c2):
+    x1 = c1[0][0]
+    y1 = c1[0][1]
+    r1 = c1[1]
+    x2 = c2[0][0]
+    y2 = c2[0][1]
+    r2 = c2[1]
+    d = dist((x1, y1), (x2, y2))
+    l = ((r1*r1) - (r2*r2) + (d*d)) / (2*d)
+    h = math.sqrt((r1*r1)-(l*l))
+    Ax = (x2-x1)*l/d
+    Bx = (y2-y1)*h/d
+    Ay = (y2-y1)*l/d
+    By = (x2-x1)*h/d
+    p1 = (Ax + Bx + x1, Ay - By + y1)
+    p2 = (Ax - Bx + x1, Ay + By + y1)
+    return p1, p2
+
 if __name__ == "__main__":
     # =========================================
     root = Tk()
@@ -251,12 +269,26 @@ if __name__ == "__main__":
     root.geometry(str(YSIZE)+'x'+str(YSIZE)) #("800x800")
 
     canvas = Canvas(root, width=YSIZE, height=YSIZE, bg='#FFF', highlightbackground="#999")
-    # canvas.bind("<Button-1>", find_intersections)
+    # # canvas.bind("<Button-1>", find_intersections)
     canvas.grid(row=0, column=0)
 
-    generateRandomCircles(5)
+    generateRandomCircles(20)
     drawCircles()
-    I = find_intersections(None)
-    root.mainloop()
 
-    # estimateTime()
+    def is_intersect(arc1, arc2):
+        d = dist(arc1[0], arc2[0])
+        if d > arc1[1] + arc2[1]:
+            return False
+        if d < abs(arc1[1] - arc2[1]):
+            return False
+        return True
+
+    global S
+    for i, c1 in enumerate(S):
+        for j, c2 in enumerate(S[i+1:], start=i+1):
+            if is_intersect(c1, c2):
+                p1, p2 = getCirlceIntersection(c1, c2)
+                drawPoint(p1)
+                drawPoint(p2)
+
+    root.mainloop()
