@@ -169,8 +169,8 @@ class RedBlackTree:
 
     # *** extra functions for segments
     def yIntercept(self, s, x):
-        if feq(s[0][0], s[1][0]):
-            print('less than zero ', s[0][0], ' ', s[1][0])
+        # if feq(s[0][0], s[1][0]):
+        #     print('less than zero ', s[0][0], ' ', s[1][0])
         return ((s[0][1] - s[1][1]) * (x - s[0][0]) / (s[0][0] - s[1][0])) + s[0][1]
 
     # True if at x s1[y] < s2[y]
@@ -258,6 +258,102 @@ class RedBlackTree:
             self.root = z
         else:
             if self.Above(z.data, y.data, z.data[0][0]):
+                y.left = z
+            else:
+                y.right = z
+
+        self.size += 1
+
+    # *** ---------------------------
+
+    # *** extra functions for circles
+    # True if at x c1[y] < c2[y]
+    def CircleAbove(self, c1, c2):
+        if c1.data[0][0] == c2.data[0][0] and c1.data[0][1] == c2.data[0][1] and c1.data[1] == c2.data[1]:  # they are the same circle
+            return 'top' in c2.key
+        return c1.data[0][1] < c2.data[0][1]
+
+    # def searchx(self, x, key):
+    #     # fn used to search for a segment (data)
+    #
+    #     if x.key == key:
+    #         return x
+    #     l = None
+    #     if x.left:
+    #         l = self.searchx(x.left, key)
+    #     if l is None and x.right:
+    #         return self.searchx(x.right, key)
+    #     return l
+
+    # def swap(self, nn1, nn2):
+    #     # fn used to swap two nodes in the tree
+    #     tempKey = nn1.key
+    #     tempData = nn1.data
+    #
+    #     nn1.key = nn2.key
+    #     nn1.data = nn2.data
+    #
+    #     nn2.key = tempKey
+    #     nn2.data = tempData
+
+    def insert_circle(self, label, circle):
+        # fn used to insert a segment into the tree
+        # considering this function will be called always from the left end point of a segment
+        x = Node(label, circle)
+
+        self.__insert_helper_circle(x)
+
+        x.color = RED
+        ret = x
+        while x != self.root and x.parent.color == RED:
+            if x.parent == x.parent.parent.left:
+                y = x.parent.parent.right
+                if y and y.color == RED:
+                    x.parent.color = BLACK
+                    y.color = BLACK
+                    x.parent.parent.color = RED
+                    x = x.parent.parent
+                else:
+                    if x == x.parent.right:
+                        x = x.parent
+                        self.__left_rotate(x)
+                    x.parent.color = BLACK
+                    x.parent.parent.color = RED
+                    self.__right_rotate(x.parent.parent)
+            else:
+                y = x.parent.parent.left
+                if y and y.color == RED:
+                    x.parent.color = BLACK
+                    y.color = BLACK
+                    x.parent.parent.color = RED
+                    x = x.parent.parent
+                else:
+                    if x == x.parent.left:
+                        x = x.parent
+                        self.__right_rotate(x)
+                    x.parent.color = BLACK
+                    x.parent.parent.color = RED
+                    self.__left_rotate(x.parent.parent)
+        self.root.color = BLACK
+        return ret
+
+    def __insert_helper_circle(self, z):
+        y = NilNode.instance()
+        x = self.root
+        while x:  # and x.key != z.key: consider this checking later on, equal or left is considered as predecessor now
+            y = x
+            if self.CircleAbove(z, x):
+                x = x.left
+            else:
+                x = x.right
+
+        # if z.key == y.key or z.key == x.key: return
+
+        z.parent = y
+        if not y:
+            self.root = z
+        else:
+            if self.CircleAbove(z, x):
                 y.left = z
             else:
                 y.right = z

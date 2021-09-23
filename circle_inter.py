@@ -1,4 +1,4 @@
-from RedBlackTree2 import *
+from RedBlackTree import *
 from functools import cmp_to_key
 import math 
 import random
@@ -93,15 +93,15 @@ def intersection_point(arc1, arc2):
 # -----------------------------------------------------------------
 def find_intersections(clickEvent):
     global S
-    Q = RedBlackTree2()
+    Q = RedBlackTree()
     label = 0
     for s in S:
         S[label] = ((float(s[0][0]), float(s[0][1])), float(s[1]))
-        Q.insert(s[0][0], Event(s[0][0] - s[1], s[0][1], True, False, s[1], label))  # other_end is radius
-        Q.insert(s[1][0], Event(s[1][0] + s[1], s[1][1], False, False, s[1], label))  # other_end is radius
+        Q.insert(s[0][0] - s[1], Event(s[0][0] - s[1], s[0][1], True, False, s[1], label))  # other_end is radius
+        Q.insert(s[0][0] + s[1], Event(s[0][0] + s[1], s[0][1], False, False, s[1], label))  # other_end is radius
         label += 1
   
-    T = RedBlackTree2()
+    T = RedBlackTree()
     
     intersections = []
     
@@ -111,39 +111,69 @@ def find_intersections(clickEvent):
         Q.delete(min_node)
         if event.is_left:
             # print("left event")
-            node = T.insert_segment(str(event.label) + '_top', S[event.label])
-            # node = T.insert_segment(str(event.label) + '_top', S[event.label])
-            pred = T.predecessor(node)
-            if pred and intersect(node, pred):
-                int_pnt = intersection_point(node, pred)
+            node1 = T.insert_segment(str(event.label) + '_top', S[event.label])
+            node2 = T.insert_segment(str(event.label) + '_bottom', S[event.label])
+            pred = T.predecessor(node2)
+            if pred and intersect(node2, pred):
+                int_pnt, int_pnt2 = intersection_point(node2, pred)
                 if int_pnt[0] > event.x:
-                    Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, event.label, None))
+                    Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, node2.key, None))
+                if int_pnt2:
+                    if int_pnt2[0] > event.x:
+                        Q.insert(int_pnt2[0], Event(int_pnt2[0], int_pnt2[1], False, True, None, None, pred.key, None, node2.key, None))
                 # check for the other parameters in the event object
-            succ = T.successor(node)
-            if succ and intersect(node.data[0], node.data[1], succ.data[0], succ.data[1]):
-                int_pnt = intersection_point(node.data[0], node.data[1], succ.data[0], succ.data[1])
+            succ = T.successor(node1)
+            if succ and intersect(node1, succ):
+                int_pnt, int_pnt2 = intersection_point(node1, succ)
                 if int_pnt[0] > event.x:
-                    Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, event.label, None, succ.key, None))
+                    Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, node1.key, None, succ.key, None))
+                if int_pnt2:
+                    if int_pnt2[0] > event.x:
+                        Q.insert(int_pnt2[0], Event(int_pnt2[0], int_pnt2[1], False, True, None, None, node1.key, None, succ.key, None))
                 # check for the other parameters in the event object
-            if pred and succ and intersect(succ.data[0], succ.data[1], pred.data[0], pred.data[1]):
-                int_pnt = intersection_point(succ.data[0], succ.data[1], pred.data[0], pred.data[1])
+            if pred and succ and intersect(succ, pred):
+                int_pnt, int_pnt2 = intersection_point(succ, pred)
                 int_node = Q.search(int_pnt[0])
-                if int_node and feq(int_node.data.y, int_pnt[1]):
+                if int_node and int_node.data.is_intersection and feq(int_node.data.y, int_pnt[1]):
                     Q.delete(int_node)
+                if int_pnt2:
+                    int_node = Q.search(int_pnt2[0])
+                    if int_node and int_node.data.is_intersection and feq(int_node.data.y, int_pnt2[1]):
+                        Q.delete(int_node)
 
         elif not event.is_intersection:
             # print("right event")
-            node = T.searchx(T.root, event.label)
+            cx = event.label - (2*event.other_end)
+            node = T.searchx(T.root, str(cx) + '_top')
             if node:
                 pred = T.predecessor(node)
                 succ = T.successor(node)
-                if pred and succ and intersect(succ.data[0], succ.data[1], pred.data[0], pred.data[1]):
-                    int_pnt = intersection_point(succ.data[0], succ.data[1], pred.data[0], pred.data[1])
+                if pred and succ and intersect(succ, pred):
+                    int_pnt, int_pnt2 = intersection_point(succ, pred)
                     if int_pnt[0] > event.x:
                         Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, succ.key, None))
+                    if int_pnt2:
+                        if int_pnt2[0] > event.x:
+                            Q.insert(int_pnt2[0], Event(int_pnt2[0], int_pnt2[1], False, True, None, None, pred.key, None, succ.key, None))
                 T.delete(node)
             else:
                 print('right endpoint node not found')
+
+            node = T.searchx(T.root, str(cx) + '_bottom')
+            if node:
+                pred = T.predecessor(node)
+                succ = T.successor(node)
+                if pred and succ and intersect(succ, pred):
+                    int_pnt, int_pnt2 = intersection_point(succ, pred)
+                    if int_pnt[0] > event.x:
+                        Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, succ.key, None))
+                    if int_pnt2:
+                        if int_pnt2[0] > event.x:
+                            Q.insert(int_pnt2[0], Event(int_pnt2[0], int_pnt2[1], False, True, None, None, pred.key, None, succ.key, None))
+                T.delete(node)
+            else:
+                print('right endpoint node not found')
+
 
         else:
             # print("intersection event")
@@ -154,26 +184,40 @@ def find_intersections(clickEvent):
                 T.swap(n1, n2)
             if n1:
                 pred = T.predecessor(n1)
-                if pred and intersect(n1.data[0], n1.data[1], pred.data[0], pred.data[1]):
-                    int_pnt = intersection_point(n1.data[0], n1.data[1], pred.data[0], pred.data[1])
+                if pred and intersect(n1, pred):
+                    int_pnt, int_pnt2 = intersection_point(n1, pred)
                     if int_pnt[0] > event.x:
-                        Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, event.slabel, None))
+                        Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, n1.key, None))
+                    if int_pnt2:
+                        if int_pnt2[0] > event.x:
+                            Q.insert(int_pnt2[0], Event(int_pnt2[0], int_pnt2[1], False, True, None, None, pred.key, None, n1.key, None))
             if n2:
                 succ = T.successor(n2)
-                if succ and intersect(n2.data[0], n2.data[1], succ.data[0], succ.data[1]):
-                    int_pnt = intersection_point(n2.data[0], n2.data[1], succ.data[0], succ.data[1])
+                if succ and intersect(n2, succ):
+                    int_pnt, int_pnt2 = intersection_point(n2, succ)
                     if int_pnt[0] > event.x:
-                        Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, event.plabel, None, succ.key, None))
-            if n1 and succ and intersect(succ.data[0], succ.data[1], n1.data[0], n1.data[1]):
-                int_pnt = intersection_point(succ.data[0], succ.data[1], n1.data[0], n1.data[1])
+                        Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, n2.key, None, succ.key, None))
+                    if int_pnt2:
+                        if int_pnt2[0] > event.x:
+                            Q.insert(int_pnt2[0], Event(int_pnt2[0], int_pnt2[1], False, True, None, None, n2.key, None, succ.key, None))
+            if n1 and succ and intersect(succ, n1):
+                int_pnt, int_pnt2 = intersection_point(succ, n1)
                 int_node = Q.search(int_pnt[0])
                 if int_node and feq(int_node.data.y, int_pnt[1]):
                     Q.delete(int_node)
-            if pred and n2 and intersect(n2.data[0], n2.data[1], pred.data[0], pred.data[1]):
-                int_pnt = intersection_point(n2.data[0], n2.data[1], pred.data[0], pred.data[1])
+                if int_pnt2:
+                    int_node = Q.search(int_pnt2[0])
+                    if int_node and feq(int_node.data.y, int_pnt2[1]):
+                        Q.delete(int_node)
+            if pred and n2 and intersect(n2, pred):
+                int_pnt, int_pnt2 = intersection_point(n2, pred)
                 int_node = Q.search(int_pnt[0])
                 if int_node and feq(int_node.data.y, int_pnt[1]):
                     Q.delete(int_node)
+                if int_pnt2:
+                    int_node = Q.search(int_pnt2[0])
+                    if int_node and feq(int_node.data.y, int_pnt2[1]):
+                        Q.delete(int_node)
     if clickEvent is not None:
         for ip in intersections:
             drawPoint(ip)
