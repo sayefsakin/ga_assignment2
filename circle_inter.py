@@ -62,9 +62,18 @@ def intersect(arc1, arc2):
     if d > arc1.data[1] + arc2.data[1]:
         return False
     if d < abs(arc1.data[1] - arc2.data[1]):
-        p1, p2 = getCirlceIntersection(arc1.data, arc2.data)
-        if p1 and p2 and p1[0] == p2[0] and p1[1] == p2[1]:
-            return True
+        # p1, p2 = getCirlceIntersection(arc1.data, arc2.data)
+        # # if p1 and p2 and feq(p1[0], p2[0]) and feq(p1[1], p2[1]):
+        # if p1:
+        #     a = int(math.floor(dist(p1, arc1.data[0])))
+        #     b = int(math.floor(dist(p1, arc2.data[0])))
+        #     c = int(math.ceil(dist(p1, arc1.data[0])))
+        #     d = int(math.ceil(dist(p1, arc2.data[0])))
+        #     if (a == int(arc1.data[1]) or c == int(arc1.data[1])) and (b == int(arc1.data[1]) or d == int(arc1.data[1])):
+        #         return True
+        # if p2:
+        #     if int(math.floor(dist(p2, arc1.data[0]))) == int(arc1.data[1]) and int(math.floor(dist(p2, arc2.data[0]))) == int(arc2.data[1]):
+        #         return True
         return False
     return True
 
@@ -374,7 +383,9 @@ def generateRandomCircles(sc):
     # S = [((327.0, 373.0), 54.0), ((274.0, 297.0), 49.0), ((342.0, 279.0), 30.0)]
     # S = [((542.0, 308.0), 50.0), ((124.0, 456.0), 70.0), ((586.0, 499.0), 67.0), ((153.0, 369.0), 77.0), ((470.0, 416.0), 56.0), ((607.0, 500.0), 57.0), ((283.0, 89.0), 72.0), ((544.0, 156.0), 57.0), ((398.0, 221.0), 46.0), ((237.0, 606.0), 55.0)]
     # S = [((124.0, 456.0), 70.0), ((153.0, 369.0), 77.0)]
-    # S = [((428.0, 104.0), 58.0), ((415.0, 81.0), 31.0)]
+    S = [((428.0, 104.0), 58.0), ((415.0, 81.0), 32.0)]
+    # S = [((428.0, 104.0), 58.0), ((350.0, 40.0), 43.0)]
+    # S = [((428.0, 104.0), 58.0), ((428.0, 100.0), 54.0)]
     # S = [((662.0, 655.0), 67.0), ((538.0, 572.0), 59.0), ((552.0, 524.0), 76.0), ((643.0, 628.0), 42.0)]
 
 
