@@ -283,7 +283,7 @@ class RedBlackTree:
         # return c1.data[0][1] < c2.data[0][1]
         c1i = self.yInterceptCircle(c1, x)
         c2i = self.yInterceptCircle(c2, x)
-        return feq(c1i, c2i) or c1i < c2i
+        return (feq(c1i, c2i) and '_top' in c2.key) or c1i < c2i
 
     # def searchx(self, x, key):
     #     # fn used to search for a segment (data)
