@@ -62,6 +62,9 @@ def intersect(arc1, arc2):
     if d > arc1.data[1] + arc2.data[1]:
         return False
     if d < abs(arc1.data[1] - arc2.data[1]):
+        p1, p2 = getCirlceIntersection(arc1.data, arc2.data)
+        if p1 and p2 and p1[0] == p2[0] and p1[1] == p2[1]:
+            return True
         return False
     return True
 
@@ -97,7 +100,9 @@ def getCirlceIntersection(c1, c2):
     if feq(d, 0.0):
         return None, None
     l = ((r1*r1) - (r2*r2) + (d*d)) / (2*d)
-    h = math.sqrt((r1*r1)-(l*l))
+    h = 0
+    if (r1*r1) > (l*l):
+        h = math.sqrt((r1*r1)-(l*l))
     Ax = (x2-x1)*l/d
     Bx = (y2-y1)*h/d
     Ay = (y2-y1)*l/d
@@ -364,12 +369,12 @@ def generateRandomCircles(sc):
     global S
     minRadius = 30
     maxRadius = 80
-    # S = [((random.randint(maxRadius, YSIZE - maxRadius), random.randint(maxRadius, YSIZE-maxRadius)), random.randint(minRadius, maxRadius)) for _ in range(sc)]
+    S = [((random.randint(maxRadius, YSIZE - maxRadius), random.randint(maxRadius, YSIZE-maxRadius)), random.randint(minRadius, maxRadius)) for _ in range(sc)]
     # S = [((376.0, 453.0), 78.0), ((327.0, 373.0), 54.0), ((274.0, 297.0), 49.0), ((422.0, 583.0), 64.0), ((423.0, 373.0), 51.0), ((538.0, 625.0), 72.0), ((342.0, 279.0), 30.0), ((559.0, 548.0), 59.0)]
     # S = [((327.0, 373.0), 54.0), ((274.0, 297.0), 49.0), ((342.0, 279.0), 30.0)]
     # S = [((542.0, 308.0), 50.0), ((124.0, 456.0), 70.0), ((586.0, 499.0), 67.0), ((153.0, 369.0), 77.0), ((470.0, 416.0), 56.0), ((607.0, 500.0), 57.0), ((283.0, 89.0), 72.0), ((544.0, 156.0), 57.0), ((398.0, 221.0), 46.0), ((237.0, 606.0), 55.0)]
     # S = [((124.0, 456.0), 70.0), ((153.0, 369.0), 77.0)]
-    S = [((428.0, 104.0), 58.0), ((415.0, 81.0), 31.0)]
+    # S = [((428.0, 104.0), 58.0), ((415.0, 81.0), 31.0)]
     # S = [((662.0, 655.0), 67.0), ((538.0, 572.0), 59.0), ((552.0, 524.0), 76.0), ((643.0, 628.0), 42.0)]
 
 
