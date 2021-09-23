@@ -246,20 +246,20 @@ def find_intersections(S):
                     int_pnt, int_pnt2, is_only = intersection_point(n1, pred)
                     if is_only and int_pnt:
                         if int_pnt[0] > event.x:
-                            Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, n1.key, None))
+                            Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, pred.key, None, n2.key, None))
                     if is_only and int_pnt2:
                         if int_pnt2[0] > event.x:
-                            Q.insert(int_pnt2[0], Event(int_pnt2[0], int_pnt2[1], False, True, None, None, pred.key, None, n1.key, None))
+                            Q.insert(int_pnt2[0], Event(int_pnt2[0], int_pnt2[1], False, True, None, None, pred.key, None, n2.key, None))
             if n2:
                 succ = T.successor(n2)
                 if succ and intersect(n2, succ):
                     int_pnt, int_pnt2, is_only = intersection_point(n2, succ)
                     if is_only and int_pnt:
                         if int_pnt[0] > event.x:
-                            Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, n2.key, None, succ.key, None))
+                            Q.insert(int_pnt[0], Event(int_pnt[0], int_pnt[1], False, True, None, None, n1.key, None, succ.key, None))
                     if is_only and int_pnt2:
                         if int_pnt2[0] > event.x:
-                            Q.insert(int_pnt2[0], Event(int_pnt2[0], int_pnt2[1], False, True, None, None, n2.key, None, succ.key, None))
+                            Q.insert(int_pnt2[0], Event(int_pnt2[0], int_pnt2[1], False, True, None, None, n1.key, None, succ.key, None))
             if n1 and succ and intersect(succ, n1):
                 int_pnt, int_pnt2, is_only = intersection_point(succ, n1)
                 if int_pnt:
