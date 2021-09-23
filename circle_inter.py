@@ -281,21 +281,21 @@ def find_intersections(S):
                     int_pnt, int_pnt2, is_only = intersection_point(n2, pred)
                     if int_pnt:
                         int_node = Q.search(int_pnt[0])
-                        if int_node and feq(int_node.data.y, int_pnt[1]):
+                        if int_node and feq(int_node.data.y, int_pnt[1]) and int_pnt[0] < event.x:
                             Q.delete(int_node)
                     if int_pnt2:
                         int_node = Q.search(int_pnt2[0])
-                        if int_node and feq(int_node.data.y, int_pnt2[1]):
+                        if int_node and feq(int_node.data.y, int_pnt2[1]) and int_pnt2[0] < event.x:
                             Q.delete(int_node)
                 if succ and n2 and intersect(n2, succ):
                     int_pnt, int_pnt2, is_only = intersection_point(n2, succ)
                     if int_pnt:
                         int_node = Q.search(int_pnt[0])
-                        if int_node and feq(int_node.data.y, int_pnt[1]):
+                        if int_node and feq(int_node.data.y, int_pnt[1]) and int_pnt[0] < event.x:
                             Q.delete(int_node)
                     if int_pnt2:
                         int_node = Q.search(int_pnt2[0])
-                        if int_node and feq(int_node.data.y, int_pnt2[1]):
+                        if int_node and feq(int_node.data.y, int_pnt2[1]) and int_pnt2[0] < event.x:
                             Q.delete(int_node)
 
             if n2:
@@ -318,21 +318,21 @@ def find_intersections(S):
                     int_pnt, int_pnt2, is_only = intersection_point(succ, n1)
                     if int_pnt:
                         int_node = Q.search(int_pnt[0])
-                        if int_node and feq(int_node.data.y, int_pnt[1]):
+                        if int_node and feq(int_node.data.y, int_pnt[1]) and int_pnt[0] < event.x:
                             Q.delete(int_node)
                     if int_pnt2:
                         int_node = Q.search(int_pnt2[0])
-                        if int_node and feq(int_node.data.y, int_pnt2[1]):
+                        if int_node and feq(int_node.data.y, int_pnt2[1]) and int_pnt2[0] < event.x:
                             Q.delete(int_node)
                 if n1 and pred and intersect(pred, n1):
                     int_pnt, int_pnt2, is_only = intersection_point(pred, n1)
                     if int_pnt:
                         int_node = Q.search(int_pnt[0])
-                        if int_node and feq(int_node.data.y, int_pnt[1]):
+                        if int_node and feq(int_node.data.y, int_pnt[1]) and int_pnt[0] < event.x:
                             Q.delete(int_node)
                     if int_pnt2:
                         int_node = Q.search(int_pnt2[0])
-                        if int_node and feq(int_node.data.y, int_pnt2[1]):
+                        if int_node and feq(int_node.data.y, int_pnt2[1]) and int_pnt2[0] < event.x:
                             Q.delete(int_node)
 
     return intersections
@@ -366,9 +366,9 @@ def generateRandomCircles(sc):
     global S
     minRadius = 30
     maxRadius = 80
-    S = [((random.randint(maxRadius, YSIZE - maxRadius), random.randint(maxRadius, YSIZE-maxRadius)), random.randint(minRadius, maxRadius)) for _ in range(sc)]
+    # S = [((random.randint(maxRadius, YSIZE - maxRadius), random.randint(maxRadius, YSIZE-maxRadius)), random.randint(minRadius, maxRadius)) for _ in range(sc)]
     # S = [((376.0, 453.0), 78.0), ((327.0, 373.0), 54.0), ((274.0, 297.0), 49.0), ((422.0, 583.0), 64.0), ((423.0, 373.0), 51.0), ((538.0, 625.0), 72.0), ((342.0, 279.0), 30.0), ((559.0, 548.0), 59.0)]
-    # S = [((327.0, 373.0), 54.0), ((274.0, 297.0), 49.0), ((342.0, 279.0), 30.0)]
+    S = [((327.0, 373.0), 54.0), ((274.0, 297.0), 49.0), ((342.0, 279.0), 30.0)]
     # S = [((542.0, 308.0), 50.0), ((124.0, 456.0), 70.0), ((586.0, 499.0), 67.0), ((153.0, 369.0), 77.0), ((470.0, 416.0), 56.0), ((607.0, 500.0), 57.0), ((283.0, 89.0), 72.0), ((544.0, 156.0), 57.0), ((398.0, 221.0), 46.0), ((237.0, 606.0), 55.0)]
     # S = [((124.0, 456.0), 70.0), ((153.0, 369.0), 77.0)]
     # S = [((428.0, 104.0), 58.0), ((415.0, 81.0), 31.0)]
