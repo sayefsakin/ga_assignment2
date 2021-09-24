@@ -159,6 +159,33 @@ def makeRandomSegment(sc, spacing=50):
         S.append([p, P[next_p]])
     return P[:len(P)-1], S
 
+
+# line segment defined by s, from point p
+def calculateAngle(s, p):
+    x1 = s[0][0]
+    y1 = s[0][1]
+    x2 = s[1][0]
+    y2 = s[1][1]
+    x3 = p[0]
+    y3 = p[1]
+    return math.atan((y1-y3)/(x1-x3)) - math.atan((y2-y3)/(x2-x3))
+
+def isInsidePolygon(polygon, p):
+    # sum = 0.0
+    # for seg in polygon:
+    #     sum = sum + calculateAngle(seg, p)
+    # return feq(sum, 2.0*math.pi)
+
+    ret = False
+    for seg in polygon:
+        if ((seg[1][1]>p[1]) != (seg[0][1]>p[1])) and (p[0] < (seg[0][0]-seg[1][0]) * (p[1]-seg[1][1]) / (seg[0][1]-seg[1][1]) + seg[1][0]):
+            if ret:
+                ret = False
+            else:
+                ret = True
+    return ret
+
+
 if __name__ == "__main__":
     # =========================================
     isFirstClick = False
@@ -193,43 +220,43 @@ if __name__ == "__main__":
     #       [ P1[3], P1[4]],
     #       [ P1[4], P1[0]],
     #     ]
-    # P1 = [(100, 500), (400, 800), (600, 200), (110, 100)]
-    #
-    # S1 = [[ P1[0], P1[1]],
-    #      [ P1[1], P1[2]],
-    #      [ P1[2], P1[3]],
-    #      [ P1[3], P1[0]],
-    #     ]
+    P1 = [(100, 500), (400, 800), (600, 200), (110, 100)]
+
+    S1 = [[ P1[0], P1[1]],
+         [ P1[1], P1[2]],
+         [ P1[2], P1[3]],
+         [ P1[3], P1[0]],
+        ]
 
     # myDCEL = DCEL()
     # myDCEL.build_dcel(P1, S1)
     #drawFaces(myDCEL)
 
 
-    # P2 = [(500, 900), (700, 800), (350, 100), (200, 500)]
-    #
-    # S2 = [[ P2[0], P2[1]],
-    #      [ P2[1], P2[2]],
-    #      [ P2[2], P2[3]],
-    #      [ P2[3], P2[0]],
-    #     ]
+    P2 = [(500, 900), (700, 800), (350, 100), (200, 500)]
+
+    S2 = [[ P2[0], P2[1]],
+         [ P2[1], P2[2]],
+         [ P2[2], P2[3]],
+         [ P2[3], P2[0]],
+        ]
 
     # myDCEL = DCEL()
     # myDCEL.build_dcel(P2, S2)
     # drawFaces(myDCEL)
-    def makeSegmentsFromPoints(P):
-        S = []
-        for i, p in enumerate(P):
-            next_p = i + 1
-            if next_p >= len(P):
-                next_p = 0
-            S.append([p, P[next_p]])
-        return S
-
-    P1 = [(100, 300), (400, 260), (410, 600), (150, 700), (750, 750), (600, 200), (110, 100)]
-    S1 = makeSegmentsFromPoints(P1)
-    P2 = [(80, 200), (30, 330), (120, 350), (90, 550), (130, 780), (310, 580), (510, 760), (505, 240), (315, 180), (320, 300)]
-    S2 = makeSegmentsFromPoints(P2)
+    # def makeSegmentsFromPoints(P):
+    #     S = []
+    #     for i, p in enumerate(P):
+    #         next_p = i + 1
+    #         if next_p >= len(P):
+    #             next_p = 0
+    #         S.append([p, P[next_p]])
+    #     return S
+    #
+    # P1 = [(100, 300), (400, 260), (410, 600), (150, 700), (750, 750), (600, 200), (110, 100)]
+    # S1 = makeSegmentsFromPoints(P1)
+    # P2 = [(80, 200), (30, 330), (120, 350), (90, 550), (130, 780), (310, 580), (510, 760), (505, 240), (315, 180), (320, 300)]
+    # S2 = makeSegmentsFromPoints(P2)
 
     global P3
     global S3
@@ -247,5 +274,15 @@ if __name__ == "__main__":
     # #     print(f.name)
     # # print(myDCEL.faces[0].name)
 
+    p = (500, 890)
+    drawPoint(p, 'green')
     root.mainloop()
-
+    if isInsidePolygon(S2, p):
+        print('insdie')
+    else:
+        print('outside')
+    # s = [(15, 63), (23, 12)]
+    # p = (53, 23)
+    # ang = calculateAngle(s, p)
+    # print(math.degrees(ang))
+    # print(2*math.pi)
