@@ -270,20 +270,20 @@ def estimateTime():
 
 
 if __name__ == "__main__":
-    # number_of_segments = 10
-    # if len(sys.argv) > 1:
-    #     number_of_segments = int(sys.argv[1])
-    # # =========================================
-    # root = Tk()
-    # root.title("Segments")
-    # root.geometry(str(YSIZE)+'x'+str(YSIZE)) #("800x800")
-    #
-    # canvas = Canvas(root, width=YSIZE, height=YSIZE, bg='#FFF', highlightbackground="#999")
-    # canvas.bind("<Button-1>", find_intersections_wrapper)
-    # canvas.grid(row=0, column=0)
+    number_of_segments = 10
+    if len(sys.argv) > 1:
+        number_of_segments = int(sys.argv[1])
+    # =========================================
+    root = Tk()
+    root.title("Segments")
+    root.geometry(str(YSIZE)+'x'+str(YSIZE)) #("800x800")
 
-    # generateRandomSegments(number_of_segments)
-    # drawSegments()
-    # root.mainloop()
+    canvas = Canvas(root, width=YSIZE, height=YSIZE, bg='#FFF', highlightbackground="#999")
+    canvas.bind("<Button-1>", find_intersections_wrapper)
+    canvas.grid(row=0, column=0)
 
-    estimateTime()
+    generateRandomSegments(number_of_segments)
+    drawSegments()
+    root.mainloop()
+
+    # estimateTime()

@@ -1,14 +1,12 @@
 from RedBlackTree import *
-from functools import cmp_to_key
 import math 
 import random
 from tkinter import *
-from datetime import datetime
-import copy
 import matplotlib.pyplot as plt
 
 YSIZE = 750
 PSIZE = 4
+isFirstClick = False
 
 # -----------------------------------------------------------------
 # Event class for endpts and intersection pts in our event queue
@@ -137,15 +135,22 @@ def intersection_point(arc1, arc2):
 # find_intersections callback
 # -----------------------------------------------------------------
 def find_intersections_wrapper(clickEvent):
+    global isFirstClick
+    global root
+    if isFirstClick is True:
+        root.destroy()
+        return
+    isFirstClick = True
+
     global S
     intersections = find_intersections(S)
     if clickEvent is not None:
         for ip in intersections:
             drawPoint(ip, 'blue')
-    print('circles:')
-    print(S)
-    print('intersection points: ', len(intersections))
-    print(intersections)
+    # print('circles:')
+    # print(S)
+    # print('intersection points: ', len(intersections))
+    # print(intersections)
 
 def find_intersections(S):
     Q = RedBlackTree()
@@ -235,8 +240,8 @@ def find_intersections(S):
                     if is_only and int_pnt2 and int_pnt2[0] > event.x:
                         Q.insert(int_pnt2[0], Event(int_pnt2[0], int_pnt2[1], False, True, None, None, pred.key, None, succ.key, None))
                 T.delete(node)
-            else:
-                print('right endpoint node not found')
+            # else:
+            #     print('right endpoint node not found')
 
             node = T.searchx(T.root, str(event.label) + '_top')
             if node:
@@ -249,8 +254,8 @@ def find_intersections(S):
                     if is_only and int_pnt2 and int_pnt2[0] > event.x:
                         Q.insert(int_pnt2[0], Event(int_pnt2[0], int_pnt2[1], False, True, None, None, pred.key, None, succ.key, None))
                 T.delete(node)
-            else:
-                print('right endpoint node not found')
+            # else:
+            #     print('right endpoint node not found')
 
 
         else:
@@ -377,38 +382,10 @@ def generateRandomCircles(sc):
     # S = [((662.0, 655.0), 67.0), ((538.0, 572.0), 59.0), ((552.0, 524.0), 76.0), ((643.0, 628.0), 42.0)]
 
 
-def plot_line(x_points, y_points1):
-    plt.plot(x_points, y_points1, color='green', label='output-time')
-    # plt.plot(x_points, y_points2, color="red", label="Andrews Scan")
-    # plt.plot(x_points, y_points3, color="blue", label="Divide and Conquer")
-    spacing = 50
-    plt.xlim([min(x_points) - spacing, max(x_points) + spacing])
-    plt.title('Bentley-Ottmann')
-    plt.xlabel('Number of Intersections')
-    plt.ylabel('Time (ms)')
-    plt.legend()
-    plt.grid()
-    plt.show()
-
-#
-# def estimateTime():
-#     max_points = 20
-#     cp_bf_x = list()
-#     cp_bf_y = list()
-#     cp = list()
-#     for n_points in range(max_points):
-#         generateRandomSegments(50)
-#         begin_time = datetime.now().timestamp() * 1000
-#         I = find_intersections(None)
-#         time_taken = (datetime.now().timestamp() * 1000) - begin_time
-#         cp_bf_y.append(time_taken)
-#         cp_bf_x.append(len(I))
-#         cp.append({'time': time_taken, 'ip': len(I)})
-#     cp = sorted(cp, key=lambda x: x['ip'])
-#     plot_line([d['ip'] for d in cp], [d['time'] for d in cp])
-
-
 if __name__ == "__main__":
+    number_of_circles = 10
+    if len(sys.argv) > 1:
+        number_of_circles = int(sys.argv[1])
     # =========================================
     root = Tk()
     root.title("Segments")
@@ -418,23 +395,7 @@ if __name__ == "__main__":
     canvas.bind("<Button-1>", find_intersections_wrapper)
     canvas.grid(row=0, column=0)
 
-    generateRandomCircles(10)
+    generateRandomCircles(number_of_circles)
     drawCircles()
-
-    # def is_intersect(arc1, arc2):
-    #     d = dist(arc1[0], arc2[0])
-    #     if d > arc1[1] + arc2[1]:
-    #         return False
-    #     if d < abs(arc1[1] - arc2[1]):
-    #         return False
-    #     return True
-    #
-    # global S
-    # for i, c1 in enumerate(S):
-    #     for j, c2 in enumerate(S[i+1:], start=i+1):
-    #         if is_intersect(c1, c2):
-    #             p1, p2 = getCirlceIntersection(c1, c2)
-    #             drawPoint(p1)
-    #             drawPoint(p2)
 
     root.mainloop()
