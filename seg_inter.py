@@ -1,14 +1,12 @@
 from RedBlackTree import *
-from functools import cmp_to_key
-import math 
 import random
 from tkinter import *
 from datetime import datetime
-import copy
 import matplotlib.pyplot as plt
 
-YSIZE = 750
+YSIZE = 800
 PSIZE = 4
+isFirstClick = False
 
 # -----------------------------------------------------------------
 # Event class for endpts and intersection pts in our event queue
@@ -24,10 +22,10 @@ class Event:
         self.other_end = other_end
         self.label = label
         # fields for intersection events
-        self.plabel=pl  # maybe this is predecessor label
-        self.psegment=ps
-        self.slabel=sl  # maybe this is successor label
-        self.ssegment=ss
+        self.plabel = pl
+        self.psegment = ps
+        self.slabel = sl
+        self.ssegment = ss
 
     def __str__(self):
         return str(self.label) + ' ' + str(self.plabel) + ' ' + str(self.slabel)
@@ -36,12 +34,6 @@ class Event:
 # -----------------------------------------------------------------
 # checks if line segment p1p2 and p3p4 intersect
 # -----------------------------------------------------------------
-
-
-def dist(a, b):
-    return (a[0]-b[0]) * (a[0]-b[0]) + (a[1]-b[1]) * (a[1]-b[1])
-
-
 def is_left(a, b, c):
     return (a[0]*b[1]) + (b[0]*c[1]) + (c[0]*a[1]) - (a[1]*b[0]) - (b[1]*c[0]) - (c[1]*a[0])
 
@@ -74,11 +66,14 @@ def intersect(p1, p2, p3, p4):
 def getA(p1, p2):
     return p1[1] - p2[1]
 
+
 def getB(p1, p2):
     return p2[0] - p1[0]
 
+
 def getC(p1, p2):
     return (p1[0] * p2[1]) - (p2[0] * p1[1])
+
 
 def intersection_point(p1, p2, p3, p4):
     a1 = getA(p1, p2)
@@ -96,6 +91,13 @@ def intersection_point(p1, p2, p3, p4):
 # find_intersections callback
 # -----------------------------------------------------------------
 def find_intersections_wrapper(clickEvent):
+    global isFirstClick
+    global root
+    if isFirstClick is True:
+        root.destroy()
+        return
+    isFirstClick = True
+
     global S
     intersections = find_intersections(S)
     if clickEvent is not None:
@@ -119,7 +121,6 @@ def find_intersections(S):
     T = RedBlackTree()
     
     intersections = []
-    intersected_segments = []
     
     while not Q.is_empty():
         min_node = Q.minimum()
@@ -197,14 +198,17 @@ def drawSegments():
     for s in S:
         drawLine(s[0], s[1], 'black')
 
+
 def drawLine(p1, p2, color):
     p1 = (p1[0], YSIZE - p1[1])
     p2 = (p2[0], YSIZE - p2[1])
     canvas.create_line(p1, p2, fill=color)
 
+
 def drawPoint(point):
     p = (point[0], YSIZE - point[1])
     canvas.create_oval(p[0] - PSIZE, p[1] - PSIZE, p[0] + PSIZE, p[1] + PSIZE, fill='red', w=2)
+
 
 def makeSegmentXDistinct(S):
     while True:
@@ -224,9 +228,12 @@ def makeSegmentXDistinct(S):
             break
     return S
 
+
 def generateRandomSegments(sc):
     global S
-    S = [((random.randint(0, YSIZE), random.randint(0, YSIZE)), (random.randint(0, YSIZE), random.randint(0, YSIZE))) for _ in range(sc)]
+    spacing = 50
+    S = [((random.randint(spacing, YSIZE-spacing), random.randint(spacing, YSIZE-spacing)),
+          (random.randint(spacing, YSIZE-spacing), random.randint(spacing, YSIZE-spacing))) for _ in range(sc)]
     # S = makeSegmentXDistinct(S)
 
 
@@ -252,7 +259,8 @@ def estimateTime():
     for n_points in range(max_points):
         generateRandomSegments(50)
         begin_time = datetime.now().timestamp() * 1000
-        I = find_intersections(None)
+        global S
+        I = find_intersections(S)
         time_taken = (datetime.now().timestamp() * 1000) - begin_time
         cp_bf_y.append(time_taken)
         cp_bf_x.append(len(I))
@@ -262,17 +270,20 @@ def estimateTime():
 
 
 if __name__ == "__main__":
-    # =========================================
-    root = Tk()
-    root.title("Segments")
-    root.geometry(str(YSIZE)+'x'+str(YSIZE)) #("800x800")
+    # number_of_segments = 10
+    # if len(sys.argv) > 1:
+    #     number_of_segments = int(sys.argv[1])
+    # # =========================================
+    # root = Tk()
+    # root.title("Segments")
+    # root.geometry(str(YSIZE)+'x'+str(YSIZE)) #("800x800")
+    #
+    # canvas = Canvas(root, width=YSIZE, height=YSIZE, bg='#FFF', highlightbackground="#999")
+    # canvas.bind("<Button-1>", find_intersections_wrapper)
+    # canvas.grid(row=0, column=0)
 
-    canvas = Canvas(root, width=YSIZE, height=YSIZE, bg='#FFF', highlightbackground="#999")
-    canvas.bind("<Button-1>", find_intersections_wrapper)
-    canvas.grid(row=0, column=0)
+    # generateRandomSegments(number_of_segments)
+    # drawSegments()
+    # root.mainloop()
 
-    generateRandomSegments(70)
-    drawSegments()
-    root.mainloop()
-
-    # estimateTime()
+    estimateTime()
